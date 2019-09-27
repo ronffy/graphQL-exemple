@@ -1,59 +1,26 @@
-const axios = require('axios');
 
-const { 
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLInt, 
-  GraphQLString, 
-  GraphQLBoolean, 
-  GraphQLList, 
-  GraphQLSchema 
-} = require('graphql');
+const { buildSchema } = require('graphql');
 
-const LaunchType = new GraphQLObjectType({
-  name: 'Launch',
-  fields: () => ({
-    flight_number: { type: GraphQLInt, require: true },
-    mission_name: { type: GraphQLString },
-    launch_date_local: { type: GraphQLString },
-    launch_success: { type: GraphQLBoolean },
-    rocket: { type: RocketType },
-  })
-});
-
-const RocketType = new GraphQLObjectType({
-  name: 'Rocket',
-  fields: () => ({
-    rocket_id: { type: GraphQLID },
-    rocket_name: { type: GraphQLString },
-    rocket_type: { type: GraphQLString }
-  })
-});
-
-
-const RootQuery = new GraphQLObjectType({
-  name: 'RootQueryType',
-  fields: {
-    launch: {
-      type: LaunchType,
-      args: {
-        flight_number: {
-          type: GraphQLInt
-        }
-      },
-      resolve(parent, args) {
-        return axios.get(`https://api.spacexdata.com/v3/launches/${args.flight_number}`).then(res => res.data);
-      }
-    },
-    launches: {
-      type: new GraphQLList(LaunchType),
-      resolve(parent, args) {
-        return axios.get(`https://api.spacexdata.com/v3/launches`).then(res => res.data);
-      }
-    }
+const schema = buildSchema(`
+  type RocketType {
+    rocket_id: ID
+    rocket_name: String
+    rocket_type: String
   }
-});
 
-module.exports = new GraphQLSchema({
-  query: RootQuery
-});
+  type LaunchType {
+    flight_number: Int
+    mission_name: String
+    launch_date_local: String
+    launch_success: Boolean
+    rocket: RocketType
+  }
+
+  type Query {
+    launch(flight_number: Int!): LaunchType
+    launches: [LaunchType]!
+    flight_number: String
+  }
+`);
+
+module.exports = schema;
