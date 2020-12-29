@@ -1,3 +1,10 @@
+/**
+ * @description 
+ * @author ronffy
+ * @Date 2019-09-25 11:33:59
+ * @LastEditTime 2020-12-29 19:17:33
+ * @LastEditors ronffy
+ */
 import React, { Fragment } from 'react';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
@@ -35,7 +42,7 @@ const Launches = (props) => {
 
       <Query query={LAUNCHES_QUERY}>
         {
-          ({ loading, error, data }) => {
+          ({ loading, error, data, ...otherProps }) => {
             if (loading) return <h4>Loading...</h4>
             if (error) console.log(error);
             return (
